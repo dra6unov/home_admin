@@ -19,8 +19,13 @@ type Postgres struct {
 	ConnTimeout time.Duration `mapstructure:"DB_CONNECTION_TIMEOUT"`
 }
 
+type App struct {
+	Port string `mapstructure:"APP_PORT"`
+}
+
 type Config struct {
 	Postgres Postgres `mapstructure:",squash"`
+	App      App      `mapstructure:",squash"`
 }
 
 func LoadConfig(path string) (Config, error) {
@@ -35,6 +40,7 @@ func LoadConfig(path string) (Config, error) {
 	viper.BindEnv("DB_MAXCONNS")
 	viper.BindEnv("DB_MINCONNS")
 	viper.BindEnv("DB_CONNECTION_TIMEOUT")
+	viper.BindEnv("APP_PORT")
 
 	viper.SetDefault("DB_CONNECTION_TIMEOUT", 10*time.Second)
 
