@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS passwords (
     category_id UUID NOT NULL REFERENCES password_categories(id) ON DELETE CASCADE,
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-    link TEXT,
+    url TEXT,
     login TEXT,
     password TEXT NOT NULL
 );

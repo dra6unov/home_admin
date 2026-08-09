@@ -8,6 +8,8 @@ import (
 	"sync"
 	"time"
 
+	"home-admin.com/internal/adapters/input/api"
+	"home-admin.com/internal/core/ports"
 	"home-admin.com/internal/infra/config"
 )
 
@@ -21,8 +23,10 @@ func NewServer(cfg config.Config) *Server {
 	}
 }
 
-func (s *Server) Init(ctx context.Context, wg *sync.WaitGroup) {
+func (s *Server) Init(ctx context.Context, wg *sync.WaitGroup, passHandler ports.PasswordHandler) {
 	mux := http.NewServeMux()
+	api.RegisterRouters(mux, passHandler)
+
 	srv := &http.Server{
 		Addr:         ":" + s.cfg.App.Port,
 		Handler:      mux,

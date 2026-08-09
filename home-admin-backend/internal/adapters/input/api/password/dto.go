@@ -1,0 +1,54 @@
+package password
+
+import (
+	"github.com/google/uuid"
+	"home-admin.com/internal/core/domain"
+)
+
+type CategoryDTO struct {
+	ID        uuid.UUID  `json:"id"`
+	Title     string     `json:"title"`
+	Passwords []Password `json:"passwords"`
+}
+
+type Password struct {
+	ID       uuid.UUID `json:"id"`
+	URL      *string   `json:"url"`
+	Login    *string   `json:"login"`
+	Password string    `json:"password"`
+}
+
+type CreateCategoryRequestDTO struct {
+	Title     string                  `json:"title"`
+	Passwords []PasswordCreateDataDTO `json:"passwords"`
+}
+
+type CreatePasswordsRequestDTO struct {
+	CategoryID uuid.UUID               `json:"category_id"`
+	Passwords  []PasswordCreateDataDTO `json:"passwords"`
+}
+
+type PasswordCreateDataDTO struct {
+	URL      *string `json:"url,omitempty"`
+	Login    *string `json:"login,omitempty"`
+	Password string  `json:"password"`
+}
+
+func createPasswordsToDomain(passwords []PasswordCreateDataDTO) []domain.PasswordData {
+	count := len(passwords)
+	passes := make([]domain.PasswordData, 0, count)
+
+	if count == 0 {
+		return passes
+	}
+
+	for _, password := range passwords {
+		passes = append(passes, domain.PasswordData{
+			URL:      password.URL,
+			Login:    password.Login,
+			Password: password.Password,
+		})
+	}
+
+	return passes
+}

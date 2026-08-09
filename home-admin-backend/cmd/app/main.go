@@ -15,7 +15,10 @@ import (
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	"github.com/golang-migrate/migrate/v4/source/iofs"
+	passHandlerAdapter "home-admin.com/internal/adapters/input/api/password"
+	pgAdapters "home-admin.com/internal/adapters/output/postgres"
 	"home-admin.com/internal/bootstrap"
+	"home-admin.com/internal/core/services/password"
 	"home-admin.com/internal/infra/config"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
@@ -46,9 +49,15 @@ func main() {
 	defer pg.Close()
 
 	var wg sync.WaitGroup
+
+	// Собираем хэндлер для паролей
+	passRepo := pgAdapters.NewPasswordRepository(pg.Pool)
+	passService := password.NewService(passRepo)
+	passHandler := passHandlerAdapter.NewHandler(passService)
+
 	// Запускаем http-сервер
 	server := bootstrap.NewServer(cfg)
-	server.Init(ctx, &wg)
+	server.Init(ctx, &wg, passHandler)
 
 	// Слушаем сигнал к завершению для закрытия
 	<-ctx.Done()
