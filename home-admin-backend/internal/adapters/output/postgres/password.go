@@ -71,13 +71,13 @@ func (r *PasswordRepository) CreatePasswords(ctx context.Context, passwords []do
 	return nil
 }
 
-func (r *PasswordRepository) GetAll(ctx context.Context) ([]domain.PasswordCategory, error) {
-	query := `
-	SELECT pc.id, pc.created_at, pc.updated_at, p.id, p.created_at, p.updated_at, pc.title, p.url, p.login, p.password
-FROM password_categories pc
-         LEFT JOIN public.passwords p ON pc.id = p.category_id
-ORDER BY pc.created_at DESC
-	`
+// func (r *PasswordRepository) GetAll(ctx context.Context) ([]domain.PasswordCategory, error) {
+// 	query := `
+// 	SELECT pc.id, pc.created_at, pc.updated_at, p.id, p.created_at, p.updated_at, pc.title, p.url, p.login, p.password
+// FROM password_categories pc
+//          LEFT JOIN public.passwords p ON pc.id = p.category_id
+// ORDER BY pc.created_at DESC
+// 	`
 
-	return nil, nil
-}
+// 	return nil, nil
+// }
