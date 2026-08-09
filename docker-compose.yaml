@@ -1,6 +1,29 @@
 version: '3.8'
 
 services:
+  home_admin_backend:
+    build:
+      context: home-admin-backend
+      dockerfile: Dockerfile
+    env_file:
+      - ./home-admin-backend/.env
+    environment:
+      - DB_HOST=home_admin_postgres
+      - DB_PORT=5432
+    ports:
+      - '8070:8080'
+    depends_on:
+      - postgres
+
+  home_admin_frontend:
+    build:
+      context: home-admin-frontend
+      dockerfile: Dockerfile
+    ports:
+      - '3000:3000'
+    depends_on:
+      - home_admin_backend
+
   postgres:
     container_name: home_admin_postgres
     image: postgres:16-alpine
