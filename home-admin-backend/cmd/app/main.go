@@ -16,7 +16,7 @@ import (
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	"github.com/golang-migrate/migrate/v4/source/iofs"
 	passHandlerAdapter "home-admin.com/internal/adapters/input/api/password"
-	pgAdapters "home-admin.com/internal/adapters/output/postgres"
+	pgAdapters "home-admin.com/internal/adapters/output/postgres/password_repository"
 	"home-admin.com/internal/bootstrap"
 	"home-admin.com/internal/core/services/password"
 	"home-admin.com/internal/infra/config"

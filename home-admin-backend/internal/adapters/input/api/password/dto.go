@@ -34,6 +34,27 @@ type PasswordCreateDataDTO struct {
 	Password string  `json:"password"`
 }
 
+func categoriesToDTO(categories []domain.PasswordCategory) []CategoryDTO {
+	dto := make([]CategoryDTO, len(categories))
+	for i, c := range categories {
+		passwords := make([]Password, len(c.Passwords))
+		for j, p := range c.Passwords {
+			passwords[j] = Password{
+				ID:       p.ID,
+				URL:      p.URL,
+				Login:    p.Login,
+				Password: p.Password,
+			}
+		}
+		dto[i] = CategoryDTO{
+			ID:        c.ID,
+			Title:     c.Title,
+			Passwords: passwords,
+		}
+	}
+	return dto
+}
+
 func createPasswordsToDomain(passwords []PasswordCreateDataDTO) []domain.PasswordData {
 	count := len(passwords)
 	passes := make([]domain.PasswordData, 0, count)

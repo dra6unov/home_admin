@@ -1,9 +1,11 @@
-package postgres
+package password_repository
 
 import (
 	"context"
 	"fmt"
+	"log/slog"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"home-admin.com/internal/core/domain"
 )
@@ -71,13 +73,33 @@ func (r *PasswordRepository) CreatePasswords(ctx context.Context, passwords []do
 	return nil
 }
 
-// func (r *PasswordRepository) GetAll(ctx context.Context) ([]domain.PasswordCategory, error) {
-// 	query := `
-// 	SELECT pc.id, pc.created_at, pc.updated_at, p.id, p.created_at, p.updated_at, pc.title, p.url, p.login, p.password
-// FROM password_categories pc
-//          LEFT JOIN public.passwords p ON pc.id = p.category_id
-// ORDER BY pc.created_at DESC
-// 	`
+func (r *PasswordRepository) GetAll(ctx context.Context) ([]domain.PasswordCategory, error) {
+	query := `
+		SELECT 
+			pc.id, pc.created_at, pc.updated_at, pc.title,
+			COALESCE(jsonb_agg(to_jsonb(p)) FILTER (WHERE p.id IS NOT NULL), '[]'::jsonb) AS passwords
+		FROM password_categories pc
+		LEFT JOIN passwords p ON p.category_id = pc.id
+		GROUP BY pc.id, pc.created_at, pc.updated_at, pc.title
+		ORDER BY pc.created_at DESC;
+	`
 
-// 	return nil, nil
-// }
+	rows, err := r.db.Query(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+
+	categories, err := pgx.CollectRows(rows, func(row pgx.CollectableRow) (domain.PasswordCategory, error) {
+		categoryRow, err := pgx.RowToStructByName[categoryDTO](row)
+		if err != nil {
+			return domain.PasswordCategory{}, err
+		}
+		return categoryRow.toDomain(), nil
+	})
+	if err != nil {
+		slog.ErrorContext(ctx, "get all query", "error", err)
+		return nil, err
+	}
+
+	return categories, nil
+}

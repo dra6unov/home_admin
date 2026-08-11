@@ -1,67 +1,51 @@
 'use client';
 
 import { Plus, SaveAll } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { PasswordBlock, PasswordData } from '../components/Password';
 
-const initialBlocks = [
-  {
-    id: 1,
-    title: 'Работа',
-    items: [
-      {
-        id: 1,
-        url: 'https://work.company.com',
-        login: 'work@company.com',
-        password: 'WorkPass123!',
-      },
-      {
-        id: 2,
-        url: 'https://admin.company.com',
-        login: 'admin',
-        password: 'AdminPass456',
-      },
-    ],
-    defaultExpanded: false,
-  },
-  {
-    id: 2,
-    title: 'Личное',
-    items: [
-      {
-        id: 3,
-        url: 'https://gmail.com',
-        login: 'personal@gmail.com',
-        password: 'Personal789',
-      },
-    ],
-    defaultExpanded: false,
-  },
-];
+interface ApiBlock {
+  id: string;
+  title: string;
+  passwords: PasswordData[];
+}
+
+interface Block {
+  id: string;
+  title: string;
+  items: PasswordData[];
+  defaultExpanded: boolean;
+}
 
 export default function Page() {
-  const [blocks, setBlocks] =
-    useState<
-      { id: number; title: string; items: PasswordData[]; defaultExpanded: boolean }[]
-    >(initialBlocks);
+  const [blocks, setBlocks] = useState<Block[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const getNextItemId = () => {
-    const allIds = blocks.flatMap((b) => b.items.map((i) => i.id));
-    return allIds.length > 0 ? Math.max(...allIds) + 1 : 1;
-  };
+  useEffect(() => {
+    fetch('http://localhost:8060/passwords')
+      .then((res) => res.json())
+      .then((data: ApiBlock[]) => {
+        const mapped: Block[] = data.map((block) => ({
+          id: block.id,
+          title: block.title,
+          items: block.passwords,
+          defaultExpanded: false,
+        }));
+        setBlocks(mapped);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, []);
 
-  const getNextBlockId = () => {
-    const allIds = blocks.map((b) => b.id);
-    return allIds.length > 0 ? Math.max(...allIds) + 1 : 1;
-  };
+  const generateId = () => crypto.randomUUID();
 
   const handleCreate = () => {
     setBlocks([
       ...blocks,
       {
-        id: getNextBlockId(),
+        id: generateId(),
         title: 'Новая категория',
-        items: [{ id: getNextItemId(), url: '', login: '', password: '' }],
+        items: [{ id: generateId(), url: '', login: '', password: '' }],
         defaultExpanded: true,
       },
     ]);
@@ -91,8 +75,11 @@ export default function Page() {
         </button>
       </div>
 
-      <div className="space-y-2">
-        {blocks.map((block, index) => (
+      {loading ? (
+        <p className="text-gray-500">Загрузка...</p>
+      ) : (
+        <div className="space-y-2">
+          {blocks.map((block, index) => (
           <PasswordBlock
             key={block.id}
             id={block.id}
@@ -108,7 +95,7 @@ export default function Page() {
               const updated = [...blocks];
               updated[index].items = [
                 ...updated[index].items,
-                { id: getNextItemId(), url: '', login: '', password: '' },
+                { id: generateId(), url: '', login: '', password: '' },
               ];
               setBlocks(updated);
             }}
@@ -124,7 +111,8 @@ export default function Page() {
             }}
           />
         ))}
-      </div>
+        </div>
+      )}
     </div>
   );
 }

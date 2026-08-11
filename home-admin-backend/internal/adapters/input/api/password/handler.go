@@ -74,3 +74,21 @@ func (h *handler) CreatePasswords(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Ошибка кодирования JSON: %v", err)
 	}
 }
+
+func (h *handler) GetAll(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	categories, err := h.service.GetAll(ctx)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	categoriesDTO := categoriesToDTO(categories)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	if err = json.NewEncoder(w).Encode(categoriesDTO); err != nil {
+		log.Printf("Ошибка кодирования JSON: %v", err)
+	}
+}

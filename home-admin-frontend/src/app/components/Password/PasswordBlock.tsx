@@ -5,19 +5,19 @@ import { useState } from 'react';
 import { PasswordItem } from './PasswordItem';
 
 export interface PasswordData {
-  id: number;
+  id: string;
   url: string;
   login: string;
   password: string;
 }
 
 export interface PasswordBlockProps {
-  id: number;
+  id: string;
   title: string;
   items: PasswordData[];
   onTitleChange?: (title: string) => void;
   onAddItem?: () => void;
-  onDeleteItem?: (itemId: number) => void;
+  onDeleteItem?: (itemId: string) => void;
   onDeleteBlock?: () => void;
   defaultExpanded?: boolean;
 }

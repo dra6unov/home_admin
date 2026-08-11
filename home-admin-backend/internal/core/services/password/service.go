@@ -57,3 +57,7 @@ func (s *service) CreatePasswords(ctx context.Context, categoryID string, passwo
 
 	return domainPasswords, nil
 }
+
+func (s *service) GetAll(ctx context.Context) ([]domain.PasswordCategory, error) {
+	return s.passwordRepo.GetAll(ctx)
+}

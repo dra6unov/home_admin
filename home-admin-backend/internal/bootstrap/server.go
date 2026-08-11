@@ -8,6 +8,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/rs/cors"
 	"home-admin.com/internal/adapters/input/api"
 	"home-admin.com/internal/core/ports"
 	"home-admin.com/internal/infra/config"
@@ -27,9 +28,11 @@ func (s *Server) Init(ctx context.Context, wg *sync.WaitGroup, passHandler ports
 	mux := http.NewServeMux()
 	api.RegisterRouters(mux, passHandler)
 
+	handler := applyCORS(mux)
+
 	srv := &http.Server{
 		Addr:         ":" + s.cfg.App.Port,
-		Handler:      mux,
+		Handler:      handler,
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 10 * time.Second,
 		IdleTimeout:  15 * time.Second,
@@ -61,4 +64,15 @@ func (s *Server) Init(ctx context.Context, wg *sync.WaitGroup, passHandler ports
 	}()
 
 	slog.Info("Service serve", "port", s.cfg.App.Port)
+}
+
+func applyCORS(next http.Handler) http.Handler {
+	c := cors.New(cors.Options{
+		AllowedOrigins:   []string{"http://localhost:3000"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Content-Type", "Authorization"},
+		AllowCredentials: true,
+	})
+
+	return c.Handler(next)
 }
