@@ -1,6 +1,10 @@
+import GoogleSearch from '@/app/components/GoogleSearch/GoogleSearch';
+
 export default function Home() {
 	return (
 		<div className="space-y-4 sm:space-y-6">
+			<GoogleSearch />
+
 			<div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
 				<h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Добро пожаловать!</h2>
 				<p className="text-sm sm:text-base text-gray-600">
