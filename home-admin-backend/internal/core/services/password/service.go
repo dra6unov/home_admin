@@ -65,3 +65,7 @@ func (s *service) GetAll(ctx context.Context) ([]domain.PasswordCategory, error)
 func (s *service) DeletePassword(ctx context.Context, id uuid.UUID) error {
 	return s.passwordRepo.DeletePassword(ctx, id)
 }
+
+func (s *service) DeleteCategory(ctx context.Context, id uuid.UUID) error {
+	return s.passwordRepo.DeleteCategory(ctx, id)
+}

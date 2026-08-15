@@ -87,3 +87,26 @@ func (h *handler) DeletePassword(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusNoContent)
 }
+
+func (h *handler) DeleteCategory(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	id := r.PathValue("id")
+	uid, err := uuid.Parse(id)
+	if err != nil {
+		http.Error(w, "Wrong id format", http.StatusBadRequest)
+		return
+	}
+
+	err = h.service.DeleteCategory(ctx, uid)
+	switch {
+	case errors.Is(err, custom_errors.ErrEntityNotFound):
+		http.Error(w, "Resource not found", http.StatusNotFound)
+		return
+	case err != nil:
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}

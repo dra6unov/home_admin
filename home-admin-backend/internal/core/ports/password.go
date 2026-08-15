@@ -13,18 +13,21 @@ type PasswordRepository interface {
 	SavePasswords(ctx context.Context, passwords []domain.Password) error
 	GetAll(ctx context.Context) ([]domain.PasswordCategory, error)
 	DeletePassword(ctx context.Context, id uuid.UUID) error
+	DeleteCategory(ctx context.Context, id uuid.UUID) error
 }
 
 type PasswordService interface {
 	SaveCategory(ctx context.Context, id *uuid.UUID, title string, passwords []domain.PasswordData) (*domain.PasswordCategory, error)
 	GetAll(ctx context.Context) ([]domain.PasswordCategory, error)
 	DeletePassword(ctx context.Context, id uuid.UUID) error
+	DeleteCategory(ctx context.Context, id uuid.UUID) error
 }
 
 type PasswordHandler interface {
 	SaveCategory(w http.ResponseWriter, r *http.Request)
 	GetAll(w http.ResponseWriter, r *http.Request)
 	DeletePassword(w http.ResponseWriter, r *http.Request)
+	DeleteCategory(w http.ResponseWriter, r *http.Request)
 }
 
 type PasswordCreateData struct {

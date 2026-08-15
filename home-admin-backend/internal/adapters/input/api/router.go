@@ -10,4 +10,5 @@ func RegisterRouters(mux *http.ServeMux, passwordHandler ports.PasswordHandler) 
 	mux.HandleFunc("POST /passwords/save", passwordHandler.SaveCategory)
 	mux.HandleFunc("GET /passwords", passwordHandler.GetAll)
 	mux.HandleFunc("DELETE /passwords/{id}", passwordHandler.DeletePassword)
+	mux.HandleFunc("DELETE /passwords/category/{id}", passwordHandler.DeleteCategory)
 }

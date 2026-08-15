@@ -133,3 +133,19 @@ func (r *PasswordRepository) DeletePassword(ctx context.Context, id uuid.UUID) e
 
 	return nil
 }
+
+func (r *PasswordRepository) DeleteCategory(ctx context.Context, id uuid.UUID) error {
+	query := `DELETE FROM password_categories WHERE id = $1;`
+
+	res, err := r.db.Exec(ctx, query, id)
+	if err != nil {
+		return fmt.Errorf("failed to execute query: %w", err)
+	}
+
+	affacted := res.RowsAffected()
+	if affacted == 0 {
+		return custom_errors.ErrEntityNotFound
+	}
+
+	return nil
+}

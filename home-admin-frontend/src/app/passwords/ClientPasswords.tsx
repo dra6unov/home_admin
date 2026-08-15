@@ -7,6 +7,7 @@ import { PasswordCategoriesPageData } from "@/lib/types/password";
 import { saveCategory } from "@/lib/api/password/saveCategory";
 import { deletePassword } from "@/lib/api/password/deletePassword";
 import { showSuccessToast, showErrorToast } from "@/lib/helpers/toast";
+import { deleteCategory } from "@/lib/api/password/deleteCategory";
 
 type ClientPasswordsProps = {
 	data: PasswordCategoriesPageData[];
@@ -74,6 +75,7 @@ export default function ClientPasswords({ data }: ClientPasswordsProps) {
 							setBlocks(updated);
 						}}
 						onDeleteItem={async itemId => {
+							if (!confirm("Вы уверены, что хотите удалить этот пароль?")) return;
 							const updated = [...blocks];
 							updated[index].passwords = updated[index].passwords.filter(item => item.id !== itemId);
 							setBlocks(updated);
@@ -85,8 +87,15 @@ export default function ClientPasswords({ data }: ClientPasswordsProps) {
 								showErrorToast("Ошибка при удалении");
 							}
 						}}
-						onDeleteBlock={() => {
+						onDeleteBlock={async () => {
+							if (!confirm("Вы уверены, что хотите удалить эту категорию?")) return;
 							setBlocks(blocks.filter(b => b.id !== block.id));
+							const success = await deleteCategory(block.id);
+							if (success) {
+								showSuccessToast("Категория удалена");
+							} else {
+								showErrorToast("Ошибка при удалении категории");
+							}
 						}}
 						onSaveBlock={async () => {
 							const success = await saveCategory(block);
