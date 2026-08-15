@@ -18,21 +18,35 @@ type Password struct {
 	Password string    `json:"password"`
 }
 
-type CreateCategoryRequestDTO struct {
-	Title     string                  `json:"title"`
-	Passwords []PasswordCreateDataDTO `json:"passwords"`
+type SaveCategoryRequestDTO struct {
+	ID        *uuid.UUID                `json:"id,omitempty"`
+	Title     string                    `json:"title"`
+	Passwords []SavePasswordsRequestDTO `json:"passwords"`
 }
 
-type CreatePasswordsRequestDTO struct {
-	CategoryID uuid.UUID               `json:"category_id"`
-	Passwords  []PasswordCreateDataDTO `json:"passwords"`
+type SavePasswordsRequestDTO struct {
+	ID       *uuid.UUID `json:"id,omitempty"`
+	URL      *string    `json:"url,omitempty"`
+	Login    *string    `json:"login,omitempty"`
+	Password string     `json:"password"`
 }
 
-type PasswordCreateDataDTO struct {
-	URL      *string `json:"url,omitempty"`
-	Login    *string `json:"login,omitempty"`
-	Password string  `json:"password"`
-}
+// type SaveCategoryRequestDTO struct {
+// 	ID        uuid.UUID               `json:"id"`
+// 	Title     string                  `json:"title"`
+// 	Passwords []PasswordCreateDataDTO `json:"passwords"`
+// }
+
+// type CreatePasswordsRequestDTO struct {
+// 	CategoryID uuid.UUID               `json:"category_id"`
+// 	Passwords  []PasswordCreateDataDTO `json:"passwords"`
+// }
+
+// type PasswordCreateDataDTO struct {
+// 	URL      *string `json:"url,omitempty"`
+// 	Login    *string `json:"login,omitempty"`
+// 	Password string  `json:"password"`
+// }
 
 func categoriesToDTO(categories []domain.PasswordCategory) []CategoryDTO {
 	dto := make([]CategoryDTO, len(categories))
@@ -55,7 +69,7 @@ func categoriesToDTO(categories []domain.PasswordCategory) []CategoryDTO {
 	return dto
 }
 
-func createPasswordsToDomain(passwords []PasswordCreateDataDTO) []domain.PasswordData {
+func createPasswordsToDomain(passwords []SavePasswordsRequestDTO) []domain.PasswordData {
 	count := len(passwords)
 	passes := make([]domain.PasswordData, 0, count)
 
@@ -64,7 +78,14 @@ func createPasswordsToDomain(passwords []PasswordCreateDataDTO) []domain.Passwor
 	}
 
 	for _, password := range passwords {
+		var id uuid.UUID
+		if password.ID != nil {
+			id = *password.ID
+		} else {
+			id = uuid.New()
+		}
 		passes = append(passes, domain.PasswordData{
+			ID:       id,
 			URL:      password.URL,
 			Login:    password.Login,
 			Password: password.Password,

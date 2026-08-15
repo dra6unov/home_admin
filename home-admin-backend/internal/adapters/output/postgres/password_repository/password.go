@@ -20,27 +20,32 @@ func NewPasswordRepository(db *pgxpool.Pool) *PasswordRepository {
 	}
 }
 
-func (r *PasswordRepository) CreateCategory(ctx context.Context, category *domain.PasswordCategory) error {
+func (r *PasswordRepository) SaveCategory(ctx context.Context, category *domain.PasswordCategory) error {
 	if category == nil {
 		return fmt.Errorf("category data is empty")
 	}
 
 	query := `
-		INSERT INTO password_categories (id, created_at, updated_at, title) VALUES ($1, $2, $3, $4)
+		INSERT INTO password_categories (id, created_at, updated_at, title)
+		VALUES ($1, $2, $3, $4)
+		ON CONFLICT (id)
+			DO UPDATE SET 
+				updated_at = EXCLUDED.updated_at,
+				title = EXCLUDED.title;
 	`
 
 	if _, err := r.db.Exec(ctx, query, category.ID, category.CreatedAt, category.UpdatedAt, category.Title); err != nil {
 		return fmt.Errorf("unable to insert row: %w", err)
 	}
 
-	if err := r.CreatePasswords(ctx, category.Passwords); err != nil {
+	if err := r.SavePasswords(ctx, category.Passwords); err != nil {
 		return fmt.Errorf("error while creating passwords with categoty: %w", err)
 	}
 
 	return nil
 }
 
-func (r *PasswordRepository) CreatePasswords(ctx context.Context, passwords []domain.Password) error {
+func (r *PasswordRepository) SavePasswords(ctx context.Context, passwords []domain.Password) error {
 	if len(passwords) == 0 {
 		return fmt.Errorf("passwords list is empty")
 	}
@@ -57,6 +62,13 @@ func (r *PasswordRepository) CreatePasswords(ctx context.Context, passwords []do
 	query := `
 		INSERT INTO passwords (id, created_at, updated_at, url, login, password, category_id)
 		VALUES ($1, $2, $3, $4, $5, $6, $7)
+		ON CONFLICT (id)
+			DO UPDATE SET 
+				updated_at = EXCLUDED.updated_at,
+				url = EXCLUDED.url,
+				login = EXCLUDED.login,
+				password = EXCLUDED.password,
+				category_id = EXCLUDED.category_id;
 	`
 
 	for _, p := range passwords {

@@ -1,0 +1,35 @@
+[*]
+indent_style = tab
+indent_size = 1
+end_of_line = lf
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+[*.ts]
+indent_style = tab
+indent_size = 1
+
+[*.tsx]
+indent_style = tab
+indent_size = 1
+
+[*.js]
+indent_style = tab
+indent_size = 1
+
+[*.jsx]
+indent_style = tab
+indent_size = 1
+
+[*.json]
+indent_style = tab
+indent_size = 1
+
+[*.css]
+indent_style = tab
+indent_size = 1
+
+[*.md]
+indent_style = tab
+indent_size = 1

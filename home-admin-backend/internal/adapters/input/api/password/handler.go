@@ -20,10 +20,10 @@ func NewHandler(service ports.PasswordService) *handler {
 	}
 }
 
-func (h *handler) CreateCategory(w http.ResponseWriter, r *http.Request) {
+func (h *handler) SaveCategory(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	var category CreateCategoryRequestDTO
+	var category SaveCategoryRequestDTO
 	if err := json.NewDecoder(r.Body).Decode(&category); err != nil {
 		http.Error(w, "wrong json", http.StatusBadRequest)
 		return
@@ -31,7 +31,7 @@ func (h *handler) CreateCategory(w http.ResponseWriter, r *http.Request) {
 
 	passwords := createPasswordsToDomain(category.Passwords)
 
-	c, err := h.service.CreateCategory(ctx, category.Title, passwords)
+	c, err := h.service.SaveCategory(ctx, category.ID, category.Title, passwords)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -40,37 +40,6 @@ func (h *handler) CreateCategory(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 	if err = json.NewEncoder(w).Encode(c); err != nil {
-		log.Printf("Ошибка кодирования JSON: %v", err)
-	}
-}
-
-func (h *handler) CreatePasswords(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	var req CreatePasswordsRequestDTO
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "wrong json", http.StatusBadRequest)
-		return
-	}
-
-	passwordData := make([]ports.PasswordCreateData, len(req.Passwords))
-	for i, p := range req.Passwords {
-		passwordData[i] = ports.PasswordCreateData{
-			URL:      p.URL,
-			Login:    p.Login,
-			Password: p.Password,
-		}
-	}
-
-	passwords, err := h.service.CreatePasswords(ctx, req.CategoryID.String(), passwordData)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-	if err = json.NewEncoder(w).Encode(passwords); err != nil {
 		log.Printf("Ошибка кодирования JSON: %v", err)
 	}
 }

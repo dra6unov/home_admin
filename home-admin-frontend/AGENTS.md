@@ -6,4 +6,9 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
 
+## В этом проекте следуй следующим правилам:
+
+1. Для запросов к бэкенду используй всегда src/lib/helpers/fetchAPI.ts
+2. Для описания типов используй type, а не interface
+
 <!-- END:nextjs-agent-rules -->

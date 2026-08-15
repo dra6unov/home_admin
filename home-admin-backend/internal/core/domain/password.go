@@ -31,21 +31,29 @@ type Password struct {
 }
 
 type PasswordData struct {
+	ID       uuid.UUID
 	URL      *string
 	Login    *string
 	Password string
 }
 
-func NewCategory(title string, passwords []PasswordData) (*PasswordCategory, error) {
+func NewCategory(id *uuid.UUID, title string, passwords []PasswordData) (*PasswordCategory, error) {
 	if title == "" {
 		return nil, ErrCategoryEmptyTitle
 	}
 
-	id := uuid.New()
+	var uid uuid.UUID
+	if id == nil {
+		uid = uuid.New()
+	} else {
+		uid = *id
+	}
+
+	// id := uuid.New()
 	now := time.Now()
 
 	c := &PasswordCategory{
-		ID:        id,
+		ID:        uid,
 		CreatedAt: now,
 		UpdatedAt: now,
 		Title:     title,
@@ -53,7 +61,7 @@ func NewCategory(title string, passwords []PasswordData) (*PasswordCategory, err
 	}
 
 	for _, d := range passwords {
-		p, err := NewPassword(id, d.URL, d.Login, d.Password)
+		p, err := NewPassword(d.ID, uid, d.URL, d.Login, d.Password)
 		if err != nil {
 			return nil, err
 		}
@@ -63,7 +71,7 @@ func NewCategory(title string, passwords []PasswordData) (*PasswordCategory, err
 	return c, nil
 }
 
-func NewPassword(categoryID uuid.UUID, url, login *string, password string) (*Password, error) {
+func NewPassword(id uuid.UUID, categoryID uuid.UUID, url, login *string, password string) (*Password, error) {
 	if password == "" {
 		return nil, ErrEmptyPassword
 	}
@@ -71,7 +79,7 @@ func NewPassword(categoryID uuid.UUID, url, login *string, password string) (*Pa
 	now := time.Now()
 
 	return &Password{
-		ID:         uuid.New(),
+		ID:         id,
 		CreatedAt:  now,
 		UpdatedAt:  now,
 		URL:        url,
