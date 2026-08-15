@@ -8,16 +8,16 @@ export const saveCategory = async (data: PasswordCategoriesPageData): Promise<bo
 		passwords: data.passwords,
 	};
 
-	console.log("payload: ", payload);
-
 	try {
 		const res = await fetchAPI({
-			path: "/password/category",
+			path: "/passwords/save",
 			method: "POST",
 			body: payload,
 		});
 
-		console.log("saveCategory res: ", res);
+		if (!res.ok) {
+			return false;
+		}
 
 		return true;
 	} catch (e) {

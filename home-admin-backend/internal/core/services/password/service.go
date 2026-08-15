@@ -61,3 +61,7 @@ func (s *service) SaveCategory(ctx context.Context, id *uuid.UUID, title string,
 func (s *service) GetAll(ctx context.Context) ([]domain.PasswordCategory, error) {
 	return s.passwordRepo.GetAll(ctx)
 }
+
+func (s *service) DeletePassword(ctx context.Context, id uuid.UUID) error {
+	return s.passwordRepo.DeletePassword(ctx, id)
+}

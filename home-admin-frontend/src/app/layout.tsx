@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Toaster } from "sonner";
 import "./globals.css";
 import AdminLayout from "./AdminLayout";
 
@@ -23,6 +24,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
 		<html lang="ru" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
 			<body className="h-full flex flex-col">
 				<AdminLayout>{children}</AdminLayout>
+				<Toaster />
 			</body>
 		</html>
 	);

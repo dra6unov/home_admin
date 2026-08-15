@@ -31,23 +31,6 @@ type SavePasswordsRequestDTO struct {
 	Password string     `json:"password"`
 }
 
-// type SaveCategoryRequestDTO struct {
-// 	ID        uuid.UUID               `json:"id"`
-// 	Title     string                  `json:"title"`
-// 	Passwords []PasswordCreateDataDTO `json:"passwords"`
-// }
-
-// type CreatePasswordsRequestDTO struct {
-// 	CategoryID uuid.UUID               `json:"category_id"`
-// 	Passwords  []PasswordCreateDataDTO `json:"passwords"`
-// }
-
-// type PasswordCreateDataDTO struct {
-// 	URL      *string `json:"url,omitempty"`
-// 	Login    *string `json:"login,omitempty"`
-// 	Password string  `json:"password"`
-// }
-
 func categoriesToDTO(categories []domain.PasswordCategory) []CategoryDTO {
 	dto := make([]CategoryDTO, len(categories))
 	for i, c := range categories {

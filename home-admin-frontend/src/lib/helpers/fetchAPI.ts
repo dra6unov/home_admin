@@ -5,14 +5,19 @@ type FetchApiRequest = {
 	cache?: RequestCache;
 };
 
+type FetchApiResponse<T> = {
+	data: T | null;
+	status: number;
+	ok: boolean;
+};
+
 export const fetchAPI = async <T>({
 	path,
 	method,
 	body,
 	cache = "no-store",
-}: FetchApiRequest): Promise<T> => {
+}: FetchApiRequest): Promise<FetchApiResponse<T>> => {
 	const url = process.env.NEXT_PUBLIC_BASE_BACKEND_URL + path;
-	console.log("url: ", url);
 
 	try {
 		const response = await fetch(url, {
@@ -20,14 +25,28 @@ export const fetchAPI = async <T>({
 			headers: {
 				"Content-Type": "application/json",
 			},
-			...(body ? { body: JSON.stringify(body) } : {}),
+			...(body !== undefined ? { body: JSON.stringify(body) } : {}),
 			cache,
 		});
 
-		return response.json();
-	} catch (e) {
-		console.log(e);
+		let data: T | null = null;
 
-		throw new Error("error while request to backend");
+		if (response.status !== 204) {
+			const contentType = response.headers.get("content-type");
+
+			if (contentType?.includes("application/json")) {
+				data = await response.json();
+			}
+		}
+
+		return {
+			data,
+			status: response.status,
+			ok: response.ok,
+		};
+	} catch (e) {
+		console.error(e);
+
+		throw new Error("Error while requesting backend");
 	}
 };

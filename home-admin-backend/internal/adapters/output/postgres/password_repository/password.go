@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"log/slog"
 
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"home-admin.com/internal/core/domain"
+	custom_errors "home-admin.com/internal/errors"
 )
 
 type PasswordRepository struct {
@@ -114,4 +116,20 @@ func (r *PasswordRepository) GetAll(ctx context.Context) ([]domain.PasswordCateg
 	}
 
 	return categories, nil
+}
+
+func (r *PasswordRepository) DeletePassword(ctx context.Context, id uuid.UUID) error {
+	query := `DELETE FROM passwords WHERE id = $1;`
+
+	res, err := r.db.Exec(ctx, query, id)
+	if err != nil {
+		return fmt.Errorf("failed to execute query: %w", err)
+	}
+
+	affacted := res.RowsAffected()
+	if affacted == 0 {
+		return custom_errors.ErrEntityNotFound
+	}
+
+	return nil
 }

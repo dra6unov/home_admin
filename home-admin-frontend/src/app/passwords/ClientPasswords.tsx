@@ -5,6 +5,8 @@ import { useState } from "react";
 import { PasswordBlock } from "../components/Password";
 import { PasswordCategoriesPageData } from "@/lib/types/password";
 import { saveCategory } from "@/lib/api/password/saveCategory";
+import { deletePassword } from "@/lib/api/password/deletePassword";
+import { showSuccessToast, showErrorToast } from "@/lib/helpers/toast";
 
 type ClientPasswordsProps = {
 	data: PasswordCategoriesPageData[];
@@ -71,17 +73,28 @@ export default function ClientPasswords({ data }: ClientPasswordsProps) {
 							}
 							setBlocks(updated);
 						}}
-						onDeleteItem={itemId => {
+						onDeleteItem={async itemId => {
 							const updated = [...blocks];
 							updated[index].passwords = updated[index].passwords.filter(item => item.id !== itemId);
 							setBlocks(updated);
+
+							const success = await deletePassword(itemId);
+							if (success) {
+								showSuccessToast("Пароль удален");
+							} else {
+								showErrorToast("Ошибка при удалении");
+							}
 						}}
 						onDeleteBlock={() => {
 							setBlocks(blocks.filter(b => b.id !== block.id));
 						}}
-						onSaveBlock={() => {
-							console.log("block: ", block);
-							saveCategory(block);
+						onSaveBlock={async () => {
+							const success = await saveCategory(block);
+							if (success) {
+								showSuccessToast("Категория сохранена");
+							} else {
+								showErrorToast("Ошибка при сохранении");
+							}
 						}}
 					/>
 				))}

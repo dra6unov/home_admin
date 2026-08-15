@@ -2,10 +2,13 @@ package password
 
 import (
 	"encoding/json"
+	"errors"
 	"log"
 	"net/http"
 
+	"github.com/google/uuid"
 	"home-admin.com/internal/core/ports"
+	custom_errors "home-admin.com/internal/errors"
 )
 
 // var _ ports.PasswordHandler = (*handler)(nil)
@@ -60,4 +63,27 @@ func (h *handler) GetAll(w http.ResponseWriter, r *http.Request) {
 	if err = json.NewEncoder(w).Encode(categoriesDTO); err != nil {
 		log.Printf("Ошибка кодирования JSON: %v", err)
 	}
+}
+
+func (h *handler) DeletePassword(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	id := r.PathValue("id")
+	uid, err := uuid.Parse(id)
+	if err != nil {
+		http.Error(w, "Wrong id format", http.StatusBadRequest)
+		return
+	}
+
+	err = h.service.DeletePassword(ctx, uid)
+	switch {
+	case errors.Is(err, custom_errors.ErrEntityNotFound):
+		http.Error(w, "Resource not found", http.StatusNotFound)
+		return
+	case err != nil:
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
 }
