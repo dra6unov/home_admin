@@ -82,15 +82,6 @@ export default function Sidebar({ expanded, mobileOpen, onToggle, onCloseMobile 
 									>
 										<Icon className="w-5 h-5 flex-shrink-0" />
 										{expanded && <span className="flex-1 text-sm">{item.label}</span>}
-										{expanded && isActive && (
-											<span className="w-1.5 h-1.5 rounded-full bg-white/80" aria-hidden="true" />
-										)}
-										{!expanded && isActive && (
-											<span
-												className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-white/80"
-												aria-hidden="true"
-											/>
-										)}
 									</Link>
 								</li>
 							);

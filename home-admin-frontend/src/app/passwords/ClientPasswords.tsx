@@ -2,7 +2,7 @@
 
 import { Plus } from "lucide-react";
 import { useState } from "react";
-import { PasswordBlock } from "../components/Password";
+import { PasswordBlock } from "../components/Password/PasswordBlock";
 import { ConfirmDialog } from "../components/ConfirmDialog/ConfirmDialog";
 import { PasswordCategoriesPageData } from "@/lib/types/password";
 import { saveCategory } from "@/lib/api/password/saveCategory";
