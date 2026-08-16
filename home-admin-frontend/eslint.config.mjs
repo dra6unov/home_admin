@@ -15,7 +15,7 @@ const eslintConfig = defineConfig([
 	]),
 	{
 		rules: {
-			"indent": ["error", "tab"],
+			"indent": ["error", "tab", { SwitchCase: 1 }],
 			"@typescript-eslint/indent": "off",
 			"no-mixed-spaces-and-tabs": ["error", "smart-tabs"],
 			"padding-line-between-statements": [

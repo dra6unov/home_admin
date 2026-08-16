@@ -24,29 +24,32 @@ export const UrlInput = ({ value, onChange }: UrlInputProps) => {
 
 	return (
 		<div className="w-full">
-			<label className="block text-xs text-gray-500 mb-1">Ссылка</label>
+			<label className="block text-xs text-faint mb-1">Ссылка</label>
 			<div className="flex items-center gap-2">
 				<input
-					className="w-full text-gray-900 text-sm bg-transparent border-none outline-none"
+					className="w-full text-ink font-mono text-sm bg-transparent border-none outline-none"
 					type="text"
 					value={value}
-					onChange={e => onChange?.(e.target.value)}
+					autoComplete="off"
+					autoCapitalize="off"
+					autoCorrect="off"
+					onChange={event => onChange?.(event.target.value)}
 				/>
 				<button
+					type="button"
 					onClick={handleOpen}
-					className="p-1 rounded hover:bg-gray-100 transition-colors shrink-0"
+					className="p-1 rounded hover:bg-line transition-colors shrink-0"
 					aria-label="Открыть ссылку"
 				>
-					<ExternalLink className="w-4 h-4 text-blue-500" />
+					<ExternalLink className="w-4 h-4 text-pine" />
 				</button>
 				<button
+					type="button"
 					onClick={handleCopy}
-					className="p-1 rounded hover:bg-gray-100 transition-colors shrink-0"
+					className="p-1 rounded hover:bg-line transition-colors shrink-0"
 					aria-label="Скопировать ссылку"
 				>
-					<Copy
-						className={`w-4 h-4 transition-colors ${copied ? "text-green-500" : "text-gray-400"}`}
-					/>
+					<Copy className={`w-4 h-4 transition-colors ${copied ? "text-pine" : "text-faint"}`} />
 				</button>
 			</div>
 		</div>

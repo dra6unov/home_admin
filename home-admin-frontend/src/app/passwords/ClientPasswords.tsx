@@ -3,6 +3,7 @@
 import { Plus } from "lucide-react";
 import { useState } from "react";
 import { PasswordBlock } from "../components/Password";
+import { ConfirmDialog } from "../components/ConfirmDialog/ConfirmDialog";
 import { PasswordCategoriesPageData } from "@/lib/types/password";
 import { saveCategory } from "@/lib/api/password/saveCategory";
 import { deletePassword } from "@/lib/api/password/deletePassword";
@@ -13,13 +14,29 @@ type ClientPasswordsProps = {
 	data: PasswordCategoriesPageData[];
 };
 
+type PendingDelete = {
+	kind: "block" | "item";
+	blockId: string;
+	itemId?: string;
+};
+
 export default function ClientPasswords({ data }: ClientPasswordsProps) {
 	const [blocks, setBlocks] = useState<PasswordCategoriesPageData[]>(data);
+	const [savingBlockId, setSavingBlockId] = useState<string | null>(null);
+	const [pendingDelete, setPendingDelete] = useState<PendingDelete | null>(null);
+
 	const generateId = () => crypto.randomUUID();
 
+	const updateBlock = (
+		blockId: string,
+		updater: (block: PasswordCategoriesPageData) => PasswordCategoriesPageData
+	) => {
+		setBlocks(prev => prev.map(block => (block.id === blockId ? updater(block) : block)));
+	};
+
 	const handleCreate = () => {
-		setBlocks([
-			...blocks,
+		setBlocks(prev => [
+			...prev,
 			{
 				id: generateId(),
 				title: "Новая категория",
@@ -29,85 +46,112 @@ export default function ClientPasswords({ data }: ClientPasswordsProps) {
 		]);
 	};
 
+	const handleConfirmDelete = async () => {
+		if (!pendingDelete) {
+			return;
+		}
+
+		if (pendingDelete.kind === "item" && pendingDelete.itemId) {
+			const { blockId, itemId } = pendingDelete;
+			const success = await deletePassword(itemId);
+			setBlocks(prev =>
+				prev.map(block =>
+					block.id === blockId
+						? { ...block, passwords: block.passwords.filter(item => item.id !== itemId) }
+						: block
+				)
+			);
+			if (success) {
+				showSuccessToast("Пароль удален");
+			} else {
+				showErrorToast("Ошибка при удалении");
+			}
+		} else if (pendingDelete.kind === "block") {
+			const success = await deleteCategory(pendingDelete.blockId);
+			setBlocks(prev => prev.filter(block => block.id !== pendingDelete.blockId));
+			if (success) {
+				showSuccessToast("Категория удалена");
+			} else {
+				showErrorToast("Ошибка при удалении категории");
+			}
+		}
+
+		setPendingDelete(null);
+	};
+
 	return (
 		<div className="space-y-3 sm:space-y-4">
-			<div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
-				<h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">Пароли</h1>
-			</div>
-
-			<div className="flex space-x-2">
+			<div className="flex">
 				<button
+					type="button"
 					onClick={handleCreate}
-					className="flex items-center gap-1 px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors"
+					className="flex items-center gap-1 px-4 py-2 bg-pine text-white rounded-xl hover:bg-pine/90 transition-colors"
 				>
 					<Plus className="w-5 h-5" />
 					Создать
 				</button>
 			</div>
 
-			<div className="space-y-2">
-				{blocks.map((block, index) => (
-					<PasswordBlock
-						key={block.id}
-						id={block.id}
-						title={block.title}
-						items={block.passwords}
-						defaultExpanded={block.defaultExpanded}
-						onTitleChange={title => {
-							const updated = [...blocks];
-							updated[index].title = title;
-							setBlocks(updated);
-						}}
-						onAddItem={() => {
-							const updated = [...blocks];
-							updated[index].passwords = [
-								...updated[index].passwords,
-								{ id: generateId(), url: "", login: "", password: "" },
-							];
-							setBlocks(updated);
-						}}
-						onItemChange={(itemId, field, value) => {
-							const updated = [...blocks];
-							const password = updated[index].passwords.find(p => p.id === itemId);
-							if (password) {
-								password[field] = value;
+			{blocks.length === 0 ? (
+				<div className="bg-card border border-line rounded-2xl p-8 text-center text-faint">
+					Категорий пока нет — создайте первую
+				</div>
+			) : (
+				<div className="space-y-2">
+					{blocks.map(block => (
+						<PasswordBlock
+							key={block.id}
+							id={block.id}
+							title={block.title}
+							items={block.passwords}
+							defaultExpanded={block.defaultExpanded}
+							saving={savingBlockId === block.id}
+							onTitleChange={title => updateBlock(block.id, prev => ({ ...prev, title }))}
+							onAddItem={() =>
+								updateBlock(block.id, prev => ({
+									...prev,
+									passwords: [...prev.passwords, { id: generateId(), url: "", login: "", password: "" }],
+								}))
 							}
-							setBlocks(updated);
-						}}
-						onDeleteItem={async itemId => {
-							if (!confirm("Вы уверены, что хотите удалить этот пароль?")) return;
-							const updated = [...blocks];
-							updated[index].passwords = updated[index].passwords.filter(item => item.id !== itemId);
-							setBlocks(updated);
+							onItemChange={(itemId, field, value) =>
+								updateBlock(block.id, prev => ({
+									...prev,
+									passwords: prev.passwords.map(item =>
+										item.id === itemId ? { ...item, [field]: value } : item
+									),
+								}))
+							}
+							onDeleteItem={itemId => setPendingDelete({ kind: "item", blockId: block.id, itemId })}
+							onDeleteBlock={() => setPendingDelete({ kind: "block", blockId: block.id })}
+							onSaveBlock={async () => {
+								setSavingBlockId(block.id);
+								const success = await saveCategory(block);
+								setSavingBlockId(null);
+								if (success) {
+									showSuccessToast("Категория сохранена");
+								} else {
+									showErrorToast("Ошибка при сохранении");
+								}
+							}}
+						/>
+					))}
+				</div>
+			)}
 
-							const success = await deletePassword(itemId);
-							if (success) {
-								showSuccessToast("Пароль удален");
-							} else {
-								showErrorToast("Ошибка при удалении");
-							}
-						}}
-						onDeleteBlock={async () => {
-							if (!confirm("Вы уверены, что хотите удалить эту категорию?")) return;
-							setBlocks(blocks.filter(b => b.id !== block.id));
-							const success = await deleteCategory(block.id);
-							if (success) {
-								showSuccessToast("Категория удалена");
-							} else {
-								showErrorToast("Ошибка при удалении категории");
-							}
-						}}
-						onSaveBlock={async () => {
-							const success = await saveCategory(block);
-							if (success) {
-								showSuccessToast("Категория сохранена");
-							} else {
-								showErrorToast("Ошибка при сохранении");
-							}
-						}}
-					/>
-				))}
-			</div>
+			{pendingDelete && (
+				<ConfirmDialog
+					tone="danger"
+					title={pendingDelete.kind === "block" ? "Удалить категорию?" : "Удалить пароль?"}
+					message={
+						pendingDelete.kind === "block"
+							? "Категория и все пароли в ней будут удалены."
+							: "Пароль будет удален без возможности восстановления."
+					}
+					confirmLabel="Удалить"
+					onConfirm={handleConfirmDelete}
+					onCancel={() => setPendingDelete(null)}
+				/>
+			)}
 		</div>
 	);
 }

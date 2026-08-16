@@ -2,27 +2,29 @@ import { fetchAPI } from "@/lib/helpers/fetchAPI";
 import { PasswordCategoriesPageData, PasswordCategoriesRequest } from "@/lib/types/password";
 
 export const getPasswords = async (): Promise<PasswordCategoriesPageData[]> => {
+	let res: Awaited<ReturnType<typeof fetchAPI<PasswordCategoriesRequest[]>>>;
+
 	try {
-		const res = await fetchAPI<PasswordCategoriesRequest[]>({
+		res = await fetchAPI<PasswordCategoriesRequest[]>({
 			path: "/passwords",
 			method: "GET",
 		});
-
-		if (!res.ok) {
-			return [];
-		}
-
-		return (
-			res.data?.map(item => ({
-				id: item.id,
-				title: item.title,
-				passwords: item.passwords || [],
-				defaultExpanded: false,
-			})) || []
-		);
 	} catch (e) {
-		console.log("error while requestig passwords: ", e);
+		console.log("error while requesting passwords: ", e);
 
-		return [];
+		throw new Error("Нет соединения с бэкендом");
 	}
+
+	if (!res.ok) {
+		throw new Error(`Бэкенд ответил ошибкой ${res.status}`);
+	}
+
+	return (
+		res.data?.map(item => ({
+			id: item.id,
+			title: item.title,
+			passwords: item.passwords || [],
+			defaultExpanded: false,
+		})) || []
+	);
 };

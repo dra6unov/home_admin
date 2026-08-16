@@ -4,12 +4,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home, Settings, Key, ChevronLeft, ChevronRight, Box, BrainCog } from "lucide-react";
 
-interface NavItem {
+type NavItem = {
 	label: string;
 	href: string;
 	icon: React.ElementType;
 	target?: string;
-}
+};
 
 const navItems: NavItem[] = [
 	{ label: "Главная", href: "/", icon: Home },
@@ -24,12 +24,12 @@ const navItems: NavItem[] = [
 	},
 ];
 
-interface SidebarProps {
+type SidebarProps = {
 	expanded: boolean;
 	mobileOpen: boolean;
 	onToggle: () => void;
 	onCloseMobile: () => void;
-}
+};
 
 export default function Sidebar({ expanded, mobileOpen, onToggle, onCloseMobile }: SidebarProps) {
 	const pathname = usePathname();
@@ -37,23 +37,25 @@ export default function Sidebar({ expanded, mobileOpen, onToggle, onCloseMobile 
 	return (
 		<>
 			{mobileOpen && (
-				<div className="fixed inset-0 z-40 bg-black/50 lg:hidden" onClick={onCloseMobile} />
+				<div className="fixed inset-0 z-40 bg-ink/50 lg:hidden" onClick={onCloseMobile} />
 			)}
 
 			<aside
-				className={`fixed top-0 left-0 z-50 h-full bg-gray-900 text-white transition-all duration-300 flex flex-col
-          ${expanded ? "w-60" : "w-16"}
-          ${mobileOpen ? "translate-x-0" : "-translate-x-full"}
-          lg:translate-x-0
-        `}
+				className={`fixed top-0 left-0 z-50 h-full bg-pine-deep text-white transition-all duration-300 motion-reduce:transition-none flex flex-col ${
+					expanded ? "w-60" : "w-16"
+				} ${mobileOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0`}
 			>
 				<div
-					className={`flex items-center h-16 border-b border-gray-700 ${expanded ? "justify-between px-4" : "justify-center px-0"}`}
+					className={`flex items-center h-16 border-b border-white/10 ${
+						expanded ? "justify-between px-4" : "justify-center px-0"
+					}`}
 				>
-					{expanded && <span className="text-lg font-bold tracking-wide">Admin</span>}
+					{expanded && <span className="font-display text-sm tracking-wide text-white">Home Admin</span>}
 					<button
 						onClick={onToggle}
-						className={`p-2 rounded-lg hover:bg-gray-700 active:bg-gray-600 transition-colors ${expanded ? "" : "hidden lg:flex"}`}
+						className={`p-2 rounded-lg text-white/70 hover:bg-white/10 hover:text-white active:bg-white/20 transition-colors ${
+							expanded ? "" : "hidden lg:flex"
+						}`}
 						aria-label={expanded ? "Свернуть меню" : "Развернуть меню"}
 					>
 						{expanded ? <ChevronLeft className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
@@ -70,37 +72,40 @@ export default function Sidebar({ expanded, mobileOpen, onToggle, onCloseMobile 
 								<li key={item.href}>
 									<Link
 										href={item.href}
-										target={item?.target || "_self"}
+										target={item.target ?? "_self"}
 										onClick={onCloseMobile}
-										className={`flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors
-                      ${expanded ? "" : "justify-center"}
-                      ${
-								isActive
-									? "bg-gray-700 text-white"
-									: "text-gray-300 hover:bg-gray-700 hover:text-white active:bg-gray-600"
-								}
-                    `}
+										aria-current={isActive ? "page" : undefined}
+										className={`relative flex items-center gap-3 rounded-full px-3 py-2.5 transition-colors motion-reduce:transition-none ${
+											expanded ? "" : "justify-center"
+										} ${isActive ? "bg-pine text-white" : "text-white/60 hover:bg-white/5 hover:text-white"}`}
 										title={!expanded ? item.label : undefined}
 									>
 										<Icon className="w-5 h-5 flex-shrink-0" />
-										{expanded && <span>{item.label}</span>}
+										{expanded && <span className="flex-1 text-sm">{item.label}</span>}
+										{expanded && isActive && (
+											<span className="w-1.5 h-1.5 rounded-full bg-white/80" aria-hidden="true" />
+										)}
+										{!expanded && isActive && (
+											<span
+												className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-white/80"
+												aria-hidden="true"
+											/>
+										)}
 									</Link>
 								</li>
 							);
 						})}
-						{/* <li key={navItems.length + 1}>
-              <Link
-                href="http://192.168.1.62:11434/"
-                className="flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors text-gray-300 hover:bg-gray-700 hover:text-white active:bg-gray-600"
-              >
-                IvanGPT
-              </Link>
-            </li> */}
 					</ul>
 				</nav>
 
-				<div className={`border-t border-gray-700 p-3 ${expanded ? "" : "hidden"}`}>
-					<p className="text-xs text-gray-500">v0.1.0</p>
+				<div className="border-t border-white/10 p-3">
+					<div className={`flex items-center gap-2 ${expanded ? "" : "justify-center"}`}>
+						<span className="relative flex h-2 w-2" aria-hidden="true">
+							<span className="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60 animate-ping motion-reduce:animate-none" />
+							<span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
+						</span>
+						{expanded && <span className="font-mono text-xs text-white/50">дом · v0.1.0</span>}
+					</div>
 				</div>
 			</aside>
 		</>

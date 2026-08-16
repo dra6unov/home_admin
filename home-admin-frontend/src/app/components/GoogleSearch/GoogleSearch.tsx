@@ -184,9 +184,11 @@ export default function GoogleSearch() {
 				method="GET"
 				target="_blank"
 				onSubmit={handleSubmit}
-				className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm sm:p-6"
+				className="rounded-2xl border border-line bg-card p-4 sm:p-6"
 			>
-				<h2 className="mb-3 text-lg font-bold text-gray-900 sm:text-xl">Поиск в Google</h2>
+				<p className="mb-3 font-mono text-[11px] uppercase tracking-widest text-faint">
+					Поиск в Google
+				</p>
 
 				<div className="flex gap-2">
 					<div className="relative flex-1">
@@ -199,11 +201,11 @@ export default function GoogleSearch() {
 							onKeyDown={handleKeyDown}
 							autoComplete="off"
 							placeholder="Введите запрос..."
-							className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm text-black outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+							className="w-full rounded-lg border border-line bg-transparent px-4 py-2 pr-16 text-sm text-ink outline-none placeholder:text-faint focus:border-pine focus:ring-2 focus:ring-pine/30 transition-colors [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden"
 						/>
 
 						{suggestions.length > 0 && (
-							<ul className="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-lg border border-gray-200 bg-white py-1 shadow-lg">
+							<ul className="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-lg border border-line bg-card py-1 shadow-lg">
 								{suggestions.map((suggestion, index) => {
 									const isActive = index === activeIndex;
 
@@ -211,8 +213,8 @@ export default function GoogleSearch() {
 										<li key={`${suggestion}-${index}`}>
 											<button
 												type="button"
-												className={`w-full px-4 py-2 text-left text-sm ${
-													isActive ? "bg-blue-50 text-blue-700" : "text-gray-700 hover:bg-gray-50"
+												className={`w-full px-4 py-2 text-left text-sm transition-colors ${
+													isActive ? "bg-pine/10 text-pine" : "text-ink hover:bg-paper"
 												}`}
 												onMouseDown={event => {
 													event.preventDefault();
@@ -236,7 +238,7 @@ export default function GoogleSearch() {
 						)}
 
 						{isLoading && (
-							<div className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400">
+							<div className="absolute right-3 top-1/2 -translate-y-1/2 font-mono text-xs text-faint">
 								Поиск...
 							</div>
 						)}
@@ -244,7 +246,7 @@ export default function GoogleSearch() {
 
 					<button
 						type="submit"
-						className="rounded-lg bg-blue-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-600"
+						className="rounded-lg bg-pine px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-pine/90"
 					>
 						Найти
 					</button>

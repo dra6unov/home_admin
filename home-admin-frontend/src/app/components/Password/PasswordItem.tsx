@@ -25,18 +25,19 @@ export const PasswordItem = ({
 	onPasswordChange,
 }: PasswordItemProps) => {
 	return (
-		<div className="bg-white px-4 py-3 rounded-xl border border-gray-200 space-y-3">
+		<div className="bg-card px-4 py-3 rounded-xl border border-line space-y-3">
 			<UrlInput value={url} onChange={onUrlChange} />
-			<div className="h-px bg-gray-200" />
+			<div className="h-px bg-line" />
 			<div className="flex items-center gap-4">
 				<LoginInput value={login} onChange={onLoginChange} />
-				<div className="w-px h-8 bg-gray-200" />
+				<div className="w-px h-8 bg-line" />
 				<PasswordInput value={password} onChange={onPasswordChange} />
 			</div>
 			{onDelete && (
 				<button
+					type="button"
 					onClick={onDelete}
-					className="flex items-center gap-1 text-xs text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg px-2 py-1 transition-colors"
+					className="flex items-center gap-1 text-xs text-amber hover:bg-amber/10 rounded-lg px-2 py-1 transition-colors"
 				>
 					<Trash2 className="w-3.5 h-3.5" />
 					Удалить

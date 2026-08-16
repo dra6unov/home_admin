@@ -18,23 +18,25 @@ export const LoginInput = ({ value, onChange }: LoginInputProps) => {
 	};
 
 	return (
-		<div className="flex-1">
-			<label className="block text-xs text-gray-500 mb-1">Логин</label>
+		<div className="flex-1 min-w-0">
+			<label className="block text-xs text-faint mb-1">Логин</label>
 			<div className="flex items-center gap-2">
 				<input
-					className="w-full text-gray-900 text-sm bg-transparent border-none outline-none"
+					className="w-full text-ink font-mono text-sm bg-transparent border-none outline-none"
 					type="text"
 					value={value}
-					onChange={e => onChange?.(e.target.value)}
+					autoComplete="off"
+					autoCapitalize="off"
+					autoCorrect="off"
+					onChange={event => onChange?.(event.target.value)}
 				/>
 				<button
+					type="button"
 					onClick={handleCopy}
-					className="p-1 rounded hover:bg-gray-100 transition-colors shrink-0"
+					className="p-1 rounded hover:bg-line transition-colors shrink-0"
 					aria-label="Скопировать логин"
 				>
-					<Copy
-						className={`w-4 h-4 transition-colors ${copied ? "text-green-500" : "text-gray-400"}`}
-					/>
+					<Copy className={`w-4 h-4 transition-colors ${copied ? "text-pine" : "text-faint"}`} />
 				</button>
 			</div>
 		</div>

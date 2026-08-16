@@ -20,7 +20,7 @@ export const saveCategory = async (data: PasswordCategoriesPageData): Promise<bo
 		}
 
 		return true;
-	} catch (e) {
+	} catch {
 		return false;
 	}
 };

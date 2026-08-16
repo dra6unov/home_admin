@@ -1,17 +1,22 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Golos_Text, JetBrains_Mono, Unbounded } from "next/font/google";
 import { Toaster } from "sonner";
 import "./globals.css";
 import AdminLayout from "./AdminLayout";
 
-const geistSans = Geist({
-	variable: "--font-geist-sans",
-	subsets: ["latin"],
+const unbounded = Unbounded({
+	variable: "--font-unbounded",
+	subsets: ["cyrillic", "latin"],
 });
 
-const geistMono = Geist_Mono({
-	variable: "--font-geist-mono",
-	subsets: ["latin"],
+const golosText = Golos_Text({
+	variable: "--font-golos-text",
+	subsets: ["cyrillic", "latin"],
+});
+
+const jetbrainsMono = JetBrains_Mono({
+	variable: "--font-jetbrains-mono",
+	subsets: ["cyrillic", "latin"],
 });
 
 export const metadata: Metadata = {
@@ -21,7 +26,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
 	return (
-		<html lang="ru" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
+		<html
+			lang="ru"
+			className={`${unbounded.variable} ${golosText.variable} ${jetbrainsMono.variable} h-full antialiased`}
+		>
 			<body className="h-full flex flex-col">
 				<AdminLayout>{children}</AdminLayout>
 				<Toaster />
