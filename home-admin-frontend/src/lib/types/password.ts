@@ -12,5 +12,5 @@ export type PasswordData = {
 };
 
 export type PasswordCategoriesPageData = PasswordCategoriesRequest & {
-	defaultExpanded: boolean;
+	defaultExpanded?: boolean;
 };

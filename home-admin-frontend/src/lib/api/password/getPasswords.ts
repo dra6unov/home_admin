@@ -24,7 +24,6 @@ export const getPasswords = async (): Promise<PasswordCategoriesPageData[]> => {
 			id: item.id,
 			title: item.title,
 			passwords: item.passwords || [],
-			defaultExpanded: false,
 		})) || []
 	);
 };
